@@ -121,13 +121,13 @@ const TEAM_DATA = {
     { 
       name: "Prof. Yi-Zhe Song", 
       role: "Lab Director", 
-      image: "yi-zhe-song.jpg",
+      image: "/yi-zhe-song.jpg",
       bio: "Investigating how seeing can be explained by drawing."
     },
     { 
       name: "Timothy Hospedales", 
       role: "Co-Director", 
-      image: "timothy-hospedales.jpg"
+      image: "/timothy-hospedales.jpg"
     },
     { 
       name: "Tao (Tony) Xiang", 
