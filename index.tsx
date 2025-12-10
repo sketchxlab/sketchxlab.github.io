@@ -132,7 +132,7 @@ const TEAM_DATA = {
     { 
       name: "Tao (Tony) Xiang", 
       role: "Co-Director", 
-      image: "tao-xiang.jpg"
+      image: "people/tao-xiang.jpg"
     }
   ],
   affiliated: [
