@@ -103,7 +103,7 @@ const NEW_PUBLICATIONS = [
     venue: "CVPR 2023",
     tag: "Best Paper Candidate",
     abstract: "A fundamental study on how sparse human sketches can guide and improve modern object detection frameworks.",
-    image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&q=80&w=600",
+    image: "object.jpg",
     links: [{ label: "ArXiv", url: "https://arxiv.org/abs/2303.15149" }]
   }
 ];
