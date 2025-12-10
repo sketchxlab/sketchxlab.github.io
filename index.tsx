@@ -130,7 +130,7 @@ const TEAM_DATA = {
     { 
       name: "Tao (Tony) Xiang", 
       role: "Co-Director", 
-      image: "tony_v2.jpg"
+      image: "tony.jpg"
     }
   ],
   affiliated: [
@@ -553,7 +553,7 @@ const Team = () => {
                 <div className="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-gray-100 p-1 group-hover:border-orange-500 transition-colors">
                   <MemberAvatar 
                     name={member.name} 
-                    image={getImgPath(member.name)} 
+                    image={member.image} 
                     className="w-full h-full rounded-full" 
                   />
                 </div>
