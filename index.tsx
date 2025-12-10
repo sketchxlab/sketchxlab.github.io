@@ -9,8 +9,7 @@ import {
   Download, 
   Menu, 
   X,
-  Github,
-  Twitter,
+  Linkedin,
   ExternalLink,
   ChevronRight,
   Mail,
@@ -60,7 +59,7 @@ const NEW_PUBLICATIONS = [
     tag: "Generative AI",
     abstract: "Introducing a distribution-guided distillation approach for generative flows, significantly accelerating inference without compromising quality.",
     image: "https://images.unsplash.com/photo-1620641788421-7f1c918e7899?auto=format&fit=crop&q=80&w=600",
-    links: [{ label: "Project Page", url: "#" }]
+    links: [{ label: "Project Page", url: "https://hmrishavbandy.github.io/sd35flash/" }]
   },
   {
     title: "Block Cascading: Acceleration of Video Models",
@@ -69,7 +68,7 @@ const NEW_PUBLICATIONS = [
     tag: "Video AI",
     abstract: "A training-free acceleration method for block-causal video models that optimizes temporal processing efficiency.",
     image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600",
-    links: [{ label: "Project Page", url: "#" }]
+    links: [{ label: "Project Page", url: "https://hmrishavbandy.github.io/block_cascading_page/" }]
   },
   {
     title: "Normalized Attention Guidance",
@@ -78,7 +77,7 @@ const NEW_PUBLICATIONS = [
     tag: "NeurIPS 2025",
     abstract: "Proposing Universal Negative Guidance for Diffusion Models to improve generation robustness and alignment.",
     image: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&q=80&w=600",
-    links: [{ label: "PDF", url: "#" }]
+    links: [{ label: "Project Page", url: "https://chendaryen.github.io/NAG.github.io/" }]
   },
   {
     title: "Nitrofusion: High-fidelity single-step diffusion",
@@ -87,7 +86,7 @@ const NEW_PUBLICATIONS = [
     tag: "CVPR 2025",
     abstract: "Achieving high-fidelity single-step diffusion generation through dynamic adversarial training strategies.",
     image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=600",
-    links: [{ label: "Project Page", url: "#" }]
+    links: [{ label: "Project Page", url: "https://chendaryen.github.io/NitroFusion.github.io/" }]
   },
   {
     title: "Demofusion: Democratising high-res generation",
@@ -96,7 +95,7 @@ const NEW_PUBLICATIONS = [
     tag: "CVPR 2024",
     abstract: "Democratising high-resolution image generation, allowing standard hardware to produce professional-grade visual content.",
     image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=600",
-    links: [{ label: "Project Page", url: "#" }]
+    links: [{ label: "Project Page", url: "https://ruoyidu.github.io/demofusion/demofusion.html" }]
   },
   {
     title: "What Can Human Sketches Do for Object Detection?",
@@ -105,7 +104,7 @@ const NEW_PUBLICATIONS = [
     tag: "Best Paper Candidate",
     abstract: "A fundamental study on how sparse human sketches can guide and improve modern object detection frameworks.",
     image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&q=80&w=600",
-    links: []
+    links: [{ label: "ArXiv", url: "https://arxiv.org/abs/2303.15149" }]
   }
 ];
 
@@ -121,13 +120,12 @@ const TEAM_DATA = {
     { 
       name: "Prof. Yi-Zhe Song", 
       role: "Lab Director", 
-      image: "/yi-zhe-song.jpg",
-      bio: "Investigating how seeing can be explained by drawing."
+      image: "yi-zhe-song.jpg"
     },
     { 
       name: "Timothy Hospedales", 
       role: "Co-Director", 
-      image: "/timothy-hospedales.jpg"
+      image: "timothy-hospedales.jpg"
     },
     { 
       name: "Tao (Tony) Xiang", 
@@ -323,9 +321,49 @@ const Navigation = ({ activeSection, scrollToSection }: { activeSection: string,
   );
 };
 
+const SketchyUnderline = ({ children, delay = 0 }: { children?: React.ReactNode, delay?: number }) => (
+  <span className="relative inline-block text-gray-400">
+    {children}
+    <svg
+      className="absolute w-full h-4 -bottom-2 left-0 pointer-events-none"
+      viewBox="0 0 100 15"
+      preserveAspectRatio="none"
+    >
+      <path
+        d="M2 10 Q 50 14 98 8"
+        stroke="#ea580c"
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+        className="sketch-path"
+        style={{ animationDelay: `${delay}s` }}
+      />
+      <path
+        d="M5 8 Q 50 16 95 6"
+        stroke="#ea580c"
+        strokeWidth="1.5"
+        fill="none"
+        strokeLinecap="round"
+        className="sketch-path"
+        style={{ animationDelay: `${delay + 0.1}s`, opacity: 0.6 }}
+      />
+    </svg>
+  </span>
+);
+
 const Hero = () => {
   return (
     <section id="hero" className="min-h-screen flex flex-col items-center justify-center pt-20 relative overflow-hidden grid-bg">
+      <style>{`
+        .sketch-path {
+          stroke-dasharray: 200;
+          stroke-dashoffset: 200;
+          animation: sketch-draw 1.5s ease-out forwards;
+        }
+        @keyframes sketch-draw {
+          to { stroke-dashoffset: 0; }
+        }
+      `}</style>
       <div className="absolute inset-0 pointer-events-none opacity-10">
         <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
           <path d="M0,50 Q25,25 50,50 T100,50" stroke="#ea580c" strokeWidth="0.5" fill="none" className="animate-pulse" />
@@ -341,7 +379,7 @@ const Hero = () => {
           </div>
         </div>
         <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight leading-tight">
-          How <span className="underline decoration-wavy decoration-2 decoration-orange-500">Seeing</span> can be explained by <span className="text-gray-400">Drawing</span>
+          How <SketchyUnderline delay={0.2}>Seeing</SketchyUnderline> can be explained by <SketchyUnderline delay={0.8}>Drawing</SketchyUnderline>
         </h1>
         <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-10 font-light leading-relaxed">
           The ultimate vision for <span className="font-semibold handwritten text-3xl"><span className="text-orange-600">Sketch</span><span className="text-black">X</span></span> is to translate human sketch data into insights on how human visual systems operate, benefiting both Computer Vision and Cognitive Science.
@@ -463,9 +501,15 @@ const Research = () => {
                 
                 <div className="flex gap-2 mt-auto">
                     {pub.links.map((link, lIdx) => (
-                        <button key={lIdx} className="text-sm font-bold uppercase tracking-wider flex items-center gap-2 text-black hover:text-orange-600 transition-all">
+                        <a 
+                            key={lIdx} 
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm font-bold uppercase tracking-wider flex items-center gap-2 text-black hover:text-orange-600 transition-all cursor-pointer"
+                        >
                         {link.label} <ExternalLink size={14} />
-                        </button>
+                        </a>
                     ))}
                     {pub.links.length === 0 && (
                         <span className="text-sm text-gray-400 italic">Paper Link Coming Soon</span>
@@ -495,9 +539,9 @@ const Team = () => {
             <h2 className="text-5xl font-bold handwritten mb-2">The People</h2>
             <p className="text-gray-500">The minds behind SketchX.</p>
           </div>
-          <button className="mt-4 md:mt-0 px-6 py-2 border border-gray-300 rounded-full hover:bg-black hover:text-white hover:border-black transition-colors text-sm font-medium">
+          <a href="mailto:y.song@surrey.ac.uk" className="mt-4 md:mt-0 px-6 py-2 border border-gray-300 rounded-full hover:bg-black hover:text-white hover:border-black transition-colors text-sm font-medium">
             Join SketchX
-          </button>
+          </a>
         </div>
 
         {/* Directors */}
@@ -515,7 +559,6 @@ const Team = () => {
                 </div>
                 <h3 className="font-bold text-lg">{member.name}</h3>
                 <p className="text-orange-600 text-xs font-bold uppercase tracking-wide mb-2">{member.role}</p>
-                {member.bio && <p className="text-gray-500 text-sm">{member.bio}</p>}
               </div>
             ))}
           </div>
@@ -535,7 +578,6 @@ const Team = () => {
                             />
                             </div>
                             <h4 className="font-bold text-sm leading-tight mb-1">{member.name}</h4>
-                            <p className="text-[10px] text-gray-500 uppercase">{member.role}</p>
                     </div>
                 ))}
             </div>
@@ -555,7 +597,6 @@ const Team = () => {
                             />
                         </div>
                         <p className="text-sm font-bold text-gray-800">{member.name}</p>
-                        <p className="text-xs text-gray-500 mt-1">PhD Student</p>
                    </div>
                ))}
            </div>
@@ -595,15 +636,14 @@ const Footer = () => {
         </div>
         <div className="flex gap-6 items-center">
             <a href="mailto:y.song@surrey.ac.uk" className="text-sm text-gray-500 hover:text-orange-600 flex items-center gap-2 transition-colors">
-                <Mail size={16} /> Contact Director
+                <Mail size={16} /> Contact
             </a>
             <div className="text-gray-500 text-sm">
             &copy; {new Date().getFullYear()} SketchX Research Lab.
             </div>
         </div>
         <div className="flex gap-4">
-          <a href="#" className="text-gray-400 hover:text-orange-600 transition-colors"><Twitter size={20} /></a>
-          <a href="#" className="text-gray-400 hover:text-orange-600 transition-colors"><Github size={20} /></a>
+          <a href="https://www.linkedin.com/in/yi-zhe-song-505782150/" target="_blank" className="text-gray-400 hover:text-orange-600 transition-colors"><Linkedin size={20} /></a>
         </div>
       </div>
     </footer>
