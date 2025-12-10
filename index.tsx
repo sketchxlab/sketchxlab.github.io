@@ -484,7 +484,7 @@ const Research = () => {
           {NEW_PUBLICATIONS.map((pub, idx) => (
             <div key={idx} className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full hover:border-orange-200 relative">
               <div className="h-48 bg-white overflow-hidden relative">
-                <img src={pub.image} alt={pub.title} className="w-full h-full object-fill transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
+                <img src={pub.image} alt={pub.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
                 <div className="absolute top-2 right-2 flex flex-col items-end gap-1">
                   <div className="bg-black text-white text-xs px-2 py-1 font-bold rounded shadow-lg">
                     {pub.venue}
