@@ -67,7 +67,7 @@ const NEW_PUBLICATIONS = [
     venue: "arXiv 2025",
     tag: "Video AI",
     abstract: "A training-free acceleration method for block-causal video models that optimizes temporal processing efficiency.",
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600",
+    image: "block.jpg",
     links: [{ label: "Project Page", url: "https://hmrishavbandy.github.io/block_cascading_page/" }]
   },
   {
@@ -76,7 +76,7 @@ const NEW_PUBLICATIONS = [
     venue: "NeurIPS 2025",
     tag: "NeurIPS 2025",
     abstract: "Proposing Universal Negative Guidance for Diffusion Models to improve generation robustness and alignment.",
-    image: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&q=80&w=600",
+    image: "nag.jpg",
     links: [{ label: "Project Page", url: "https://chendaryen.github.io/NAG.github.io/" }]
   },
   {
@@ -85,7 +85,7 @@ const NEW_PUBLICATIONS = [
     venue: "CVPR 2025",
     tag: "CVPR 2025",
     abstract: "Achieving high-fidelity single-step diffusion generation through dynamic adversarial training strategies.",
-    image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=600",
+    image: "nitro.jpg",
     links: [{ label: "Project Page", url: "https://chendaryen.github.io/NitroFusion.github.io/" }]
   },
   {
@@ -94,7 +94,7 @@ const NEW_PUBLICATIONS = [
     venue: "CVPR 2024",
     tag: "CVPR 2024",
     abstract: "Democratising high-resolution image generation, allowing standard hardware to produce professional-grade visual content.",
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=600",
+    image: "demo.jpg",
     links: [{ label: "Project Page", url: "https://ruoyidu.github.io/demofusion/demofusion.html" }]
   },
   {
@@ -103,7 +103,7 @@ const NEW_PUBLICATIONS = [
     venue: "CVPR 2023",
     tag: "Best Paper Candidate",
     abstract: "A fundamental study on how sparse human sketches can guide and improve modern object detection frameworks.",
-    image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&q=80&w=600",
+    image: "object.jpg",
     links: [{ label: "Project Page", url: "https://www.pinakinathc.me/sketch-detect/" }]
   }
 ];
@@ -130,7 +130,7 @@ const TEAM_DATA = {
     { 
       name: "Tao (Tony) Xiang", 
       role: "Co-Director", 
-      image: "tao-xiang.jpg"
+      image: "tony.jpg"
     }
   ],
   affiliated: [
