@@ -58,7 +58,7 @@ const NEW_PUBLICATIONS = [
     venue: "arXiv 2025",
     tag: "Generative AI",
     abstract: "Introducing a distribution-guided distillation approach for generative flows, significantly accelerating inference without compromising quality.",
-    image: "sd35.jpg",
+    image: "https://images.unsplash.com/photo-1620641788421-7f1c918e7899?auto=format&fit=crop&q=80&w=600",
     links: [{ label: "Project Page", url: "https://hmrishavbandy.github.io/sd35flash/" }]
   },
   {
@@ -67,7 +67,7 @@ const NEW_PUBLICATIONS = [
     venue: "arXiv 2025",
     tag: "Video AI",
     abstract: "A training-free acceleration method for block-causal video models that optimizes temporal processing efficiency.",
-    image: "block.jpg",
+    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600",
     links: [{ label: "Project Page", url: "https://hmrishavbandy.github.io/block_cascading_page/" }]
   },
   {
@@ -76,7 +76,7 @@ const NEW_PUBLICATIONS = [
     venue: "NeurIPS 2025",
     tag: "NeurIPS 2025",
     abstract: "Proposing Universal Negative Guidance for Diffusion Models to improve generation robustness and alignment.",
-    image: "nag.jpg",
+    image: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&q=80&w=600",
     links: [{ label: "Project Page", url: "https://chendaryen.github.io/NAG.github.io/" }]
   },
   {
@@ -85,7 +85,7 @@ const NEW_PUBLICATIONS = [
     venue: "CVPR 2025",
     tag: "CVPR 2025",
     abstract: "Achieving high-fidelity single-step diffusion generation through dynamic adversarial training strategies.",
-    image: "nitro.jpg",
+    image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=600",
     links: [{ label: "Project Page", url: "https://chendaryen.github.io/NitroFusion.github.io/" }]
   },
   {
@@ -94,7 +94,7 @@ const NEW_PUBLICATIONS = [
     venue: "CVPR 2024",
     tag: "CVPR 2024",
     abstract: "Democratising high-resolution image generation, allowing standard hardware to produce professional-grade visual content.",
-    image: "demo.jpg",
+    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=600",
     links: [{ label: "Project Page", url: "https://ruoyidu.github.io/demofusion/demofusion.html" }]
   },
   {
@@ -103,8 +103,8 @@ const NEW_PUBLICATIONS = [
     venue: "CVPR 2023",
     tag: "Best Paper Candidate",
     abstract: "A fundamental study on how sparse human sketches can guide and improve modern object detection frameworks.",
-    image: "object.jpg",
-    links: [{ label: "ArXiv", url: "https://arxiv.org/abs/2303.15149" }]
+    image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&q=80&w=600",
+    links: [{ label: "Project Page", url: "https://www.pinakinathc.me/sketch-detect/" }]
   }
 ];
 
@@ -484,7 +484,7 @@ const Research = () => {
           {NEW_PUBLICATIONS.map((pub, idx) => (
             <div key={idx} className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full hover:border-orange-200 relative">
               <div className="h-48 bg-gray-200 overflow-hidden relative">
-                <img src={pub.image} alt={pub.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
+                <img src={pub.image} alt={pub.title} className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
                 <div className="absolute top-2 right-2 flex flex-col items-end gap-1">
                   <div className="bg-black text-white text-xs px-2 py-1 font-bold rounded shadow-lg">
                     {pub.venue}
