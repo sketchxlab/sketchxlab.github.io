@@ -121,7 +121,7 @@ const TEAM_DATA = {
     { 
       name: "Prof. Yi-Zhe Song", 
       role: "Lab Director", 
-      image: "yi-zhe-song.jpg",
+      image: "/yi-zhe-song.jpg",
       bio: "Investigating how seeing can be explained by drawing."
     },
     { 
