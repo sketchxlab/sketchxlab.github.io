@@ -1,13 +1,16 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  // 'base: ./' ensures the app works if hosted at root (dmicdt.github.io) 
-  // or a subdirectory (dmicdt.github.io/planner)
-  base: '/', 
+  // Use relative base path so assets work in subdirectories (like GitHub Pages)
+  base: './',
   build: {
     outDir: 'dist',
+    emptyOutDir: true,
+    // This ensures we don't try to bundle the 'index.tsx' if it's picked up by default
+    rollupOptions: {
+      input: {
+        main: 'index.html',
+      },
+    },
   }
 });

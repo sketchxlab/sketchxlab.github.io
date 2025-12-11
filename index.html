@@ -4,14 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SketchX Lab</title>
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <!-- Babel Standalone for local execution -->
+    
+    <!-- React & ReactDOM (UMD Global Builds) -->
+    <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel Standalone -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
     <style>
       body {
         font-family: 'Inter', sans-serif;
@@ -26,24 +34,6 @@
         linear-gradient(90deg, #e5e5e5 1px, transparent 1px);
         background-size: 20px 20px;
       }
-      .sketch-border {
-        border: 2px solid #1a1a1a;
-        border-radius: 2px 255px 3px 25px / 255px 5px 225px 3px;
-      }
-      /* Custom scrollbar */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      }
       .animate-float {
         animation: float 6s ease-in-out infinite;
       }
@@ -52,27 +42,647 @@
         50% { transform: translateY(-20px); }
         100% { transform: translateY(0px); }
       }
+      /* Error overlay styles */
+      #error-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: white;
+        z-index: 9999;
+        padding: 2rem;
+        font-family: monospace;
+        color: red;
+        overflow: auto;
+      }
     </style>
-  <script type="importmap">
+<script type="importmap">
 {
   "imports": {
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.32.0",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
-    "react/": "https://aistudiocdn.com/react@^19.2.1/",
-    "react": "https://aistudiocdn.com/react@^19.2.1"
+    "vite": "https://esm.sh/vite@^7.2.7"
   }
 }
 </script>
-<script>
-  // Polyfill for process.env to prevent crashes when running locally
-  window.process = { env: { API_KEY: '' } };
-</script>
-<link rel="stylesheet" href="/index.css">
 </head>
   <body>
+    <div id="error-overlay"></div>
     <div id="root"></div>
-    <script type="text/babel" data-type="module" data-presets="typescript,react" src="index.tsx"></script>
-  <script type="module" src="/index.tsx"></script>
+
+    <!-- Application Code -->
+    <script type="text/babel">
+      // --- Globals ---
+      const React = window.React;
+      const ReactDOM = window.ReactDOM;
+      const { useState, useRef, useEffect } = React;
+      const { createRoot } = ReactDOM;
+
+      // --- Icons (Inlined to avoid external dependency issues) ---
+      const Icon = ({ path, size = 24, className = "" }) => (
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width={size} 
+          height={size} 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          className={className}
+        >
+          {path}
+        </svg>
+      );
+
+      const PenTool = (props) => <Icon {...props} path={<><path d="m12 19 7-7 3 3-7 7-3-3z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="m2 2 7.586 7.586"/><circle cx="11" cy="11" r="2"/></>} />;
+      const Users = (props) => <Icon {...props} path={<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>} />;
+      const FileText = (props) => <Icon {...props} path={<><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></>} />;
+      const Menu = (props) => <Icon {...props} path={<><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></>} />;
+      const X = (props) => <Icon {...props} path={<><path d="M18 6 6 18"/><path d="m6 6 12 12"/></>} />;
+      const Linkedin = (props) => <Icon {...props} path={<><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></>} />;
+      const ExternalLink = (props) => <Icon {...props} path={<><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></>} />;
+      const ChevronRight = (props) => <Icon {...props} path={<path d="m9 18 6-6-6-6"/>} />;
+      const Mail = (props) => <Icon {...props} path={<><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></>} />;
+      const Trophy = (props) => <Icon {...props} path={<><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></>} />;
+      const GraduationCap = (props) => <Icon {...props} path={<><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></>} />;
+      const Eye = (props) => <Icon {...props} path={<><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></>} />;
+      const Box = (props) => <Icon {...props} path={<><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" x2="12" y1="22.08" y2="12"/></>} />;
+      const Mic = (props) => <Icon {...props} path={<><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/><line x1="8" x2="16" y1="22" y2="22"/></>} />;
+      const Zap = (props) => <Icon {...props} path={<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>} />;
+      const Sparkles = (props) => <Icon {...props} path={<><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M9 3v4"/><path d="M3 5h4"/><path d="M3 9h4"/></>} />;
+
+      // --- Data ---
+
+      const NEWS_DATA = [
+        {
+          date: "Forthcoming",
+          title: "ACM Multimedia 2028",
+          description: "SketchX Director Prof. Yi-Zhe Song will serve as Co-General Chair for ACMMM'28. The lab is proud to help bring the conference back to London for the first time in 30 years.",
+          type: "Conference Chair"
+        },
+        {
+          date: "Dec 2025",
+          title: "NeurIPS 2025",
+          description: "SketchX is presenting two papers at NeurIPS 2025: 'Normalized Attention Guidance' and 'Fuse2Match', advancing research in diffusion models and semantic matching.",
+          type: "Conference"
+        },
+        {
+          date: "Dec 2025",
+          title: "Keynote CVMP 2025",
+          description: "Prof. Song will deliver a keynote on \"Sketch-based Interfaces for Democratising AI-Powered Creative Tools\" at the European Conference on Visual Media Production in London.",
+          type: "Keynote"
+        },
+        {
+          date: "Sep 2025",
+          title: "Keynote 3DOR 2025",
+          description: "Lab Director Prof. Song invited as a keynote speaker at the Eurographics Workshop on 3D Object Retrieval.",
+          type: "Keynote"
+        }
+      ];
+
+      const NEW_PUBLICATIONS = [
+        {
+          title: "SD3.5-Flash: Distribution-Guided Distillation",
+          authors: "H. Bandyopadhyay, R. Entezari, J. Scott, R. Adithyan, Y.Z. Song, V. Jampani",
+          venue: "arXiv 2025",
+          tag: "Generative AI",
+          abstract: "Introducing a distribution-guided distillation approach for generative flows, significantly accelerating inference without compromising quality.",
+          image: "sd35.jpg",
+          links: [{ label: "Project Page", url: "https://hmrishavbandy.github.io/sd35flash/" }]
+        },
+        {
+          title: "Block Cascading: Acceleration of Video Models",
+          authors: "H. Bandyopadhyay, N. Pinnaparaju, R. Entezari, J. Scott, Y.Z. Song, V. Jampani",
+          venue: "arXiv 2025",
+          tag: "Video AI",
+          abstract: "A training-free acceleration method for block-causal video models that optimizes temporal processing efficiency.",
+          image: "block.jpg",
+          links: [{ label: "Project Page", url: "https://hmrishavbandy.github.io/block_cascading_page/" }]
+        },
+        {
+          title: "Normalized Attention Guidance",
+          authors: "D.Y. Chen, H. Bandyopadhyay, K. Zou, Y.Z. Song",
+          venue: "NeurIPS 2025",
+          tag: "NeurIPS 2025",
+          abstract: "Proposing Universal Negative Guidance for Diffusion Models to improve generation robustness and alignment.",
+          image: "nag.jpg",
+          links: [{ label: "Project Page", url: "https://chendaryen.github.io/NAG.github.io/" }]
+        },
+        {
+          title: "Nitrofusion: High-fidelity single-step diffusion",
+          authors: "D.Y. Chen, H. Bandyopadhyay, K. Zou, Y.Z. Song",
+          venue: "CVPR 2025",
+          tag: "CVPR 2025",
+          abstract: "Achieving high-fidelity single-step diffusion generation through dynamic adversarial training strategies.",
+          image: "nitro.jpg",
+          links: [{ label: "Project Page", url: "https://chendaryen.github.io/NitroFusion.github.io/" }]
+        },
+        {
+          title: "Demofusion: Democratising high-res generation",
+          authors: "R. Du, D. Chang, T. Hospedales, Y.Z. Song, Z. Ma",
+          venue: "CVPR 2024",
+          tag: "CVPR 2024",
+          abstract: "Democratising high-resolution image generation, allowing standard hardware to produce professional-grade visual content.",
+          image: "demo.jpg",
+          links: [{ label: "Project Page", url: "https://ruoyidu.github.io/demofusion/demofusion.html" }]
+        },
+        {
+          title: "What Can Human Sketches Do for Object Detection?",
+          authors: "P. Nath Chowdhury, A.K. Bhunia, A. Sain, S. Koley, T. Xiang, Y.Z. Song",
+          venue: "CVPR 2023",
+          tag: "Best Paper Candidate",
+          abstract: "A fundamental study on how sparse human sketches can guide and improve modern object detection frameworks.",
+          image: "object.jpg",
+          links: [{ label: "Project Page", url: "https://www.pinakinathc.me/sketch-detect/" }]
+        }
+      ];
+
+      // Helper to generate filename from name
+      const getImgPath = (name) => {
+        const cleanName = name.replace(/^(Prof\.|Dr\.)\s+/, '').trim();
+        return cleanName.toLowerCase().replace(/[\s\(\)]+/g, '-').replace(/\-\-+/g, '-') + ".jpg";
+      };
+
+      const TEAM_DATA = {
+        directors: [
+    { 
+      name: "Prof. Yi-Zhe Song", 
+      role: "Lab Director", 
+      image: "yi-zhe-song.jpg"
+    },
+    { 
+      name: "Timothy Hospedales", 
+      role: "Co-Director", 
+      image: "timothy-hospedales.jpg"
+    },
+    { 
+      name: "Tao (Tony) Xiang", 
+      role: "Co-Director", 
+      image: "tony.jpg"
+    }
+        ],
+        affiliated: [
+          { name: "Yongxin Yang", role: "Affiliated Academic" },
+          { name: "Yonggang Qi", role: "Affiliated Academic" },
+          { name: "Ke Li", role: "Affiliated Academic" },
+          { name: "Kaiyue Pang", role: "Affiliated Academic" },
+          { name: "Lan Yang", role: "Affiliated Academic" }
+        ],
+        phd: [
+          "Subhadeep Koley", "Hmrishav Bandyopadhyay", "Arkaprabha Basu", 
+          "Dawn Raison", "Dongyu Wang", "Dar-Yen Chen", "Alex McDermott", 
+          "Chaitat Utintu"
+  ].map(name => ({ name, image: getImgPath(name) })),
+        alumni: [
+          { name: "Yulia Gryaditskaya", current: "Senior Research Scientist at Adobe" },
+          { name: "Anran Qi", current: "Postdoc at University of Tokyo" },
+          { name: "Conghui Hu", current: "Postdoc at NUS" },
+          { name: "Umar Riaz Muhammad", current: "Senior AI Developer at Huawei UK" },
+          { name: "Jifei Song", current: "Senior Research Scientist at Huawei UK" },
+          { name: "Da Li", current: "Research Scientist at Samsung AI UK" },
+          { name: "Qian Yu", current: "Associate Professor at Beihang University" },
+          { name: "Yi Li", current: "Senior Research Scientist at JD.com" },
+          { name: "Antonio Daniele" }, 
+          { name: "Yue Zhong" }, 
+          { name: "Dongliang Chang", current: "Associate Researcher at the Beijing University of Posts and Telecommunications" }, 
+          { name: "Ayan Kumar Bhunia" }, 
+          { name: "Ling Luo" }, 
+          { name: "Ayan Das" }, 
+          { name: "Aneeshan Sain" }, 
+          { name: "Zhiyu Qu" }, 
+          { name: "Pinaki Chowdhury" }, 
+          { name: "Yixiao Zheng" }, 
+          { name: "Ruolin Yang" }, 
+          { name: "Alexander Ashcroft" }, 
+          { name: "Ruoyi Du" }
+  ].map(p => ({ ...p, image: p.image || getImgPath(p.name) }))
+      };
+
+      // --- Components ---
+
+      const SketchingBrain = ({ className }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          <style>
+            {`
+              .brain-stroke { stroke-dasharray: 70; stroke-dashoffset: 70; }
+              .path-1 { animation: draw-1 4s linear infinite; }
+              .path-2 { animation: draw-2 4s linear infinite; }
+              @keyframes draw-1 {
+                0% { stroke-dashoffset: 70; opacity: 1; }
+                15% { stroke-dashoffset: 0; opacity: 1; }
+                85% { stroke-dashoffset: 0; opacity: 1; }
+                90% { opacity: 0; }
+                100% { stroke-dashoffset: 70; opacity: 0; }
+              }
+              @keyframes draw-2 {
+                0% { stroke-dashoffset: 70; opacity: 1; } 
+                15% { stroke-dashoffset: 70; opacity: 1; }
+                30% { stroke-dashoffset: 0; opacity: 1; }
+                85% { stroke-dashoffset: 0; opacity: 1; }
+                90% { opacity: 0; }
+                100% { stroke-dashoffset: 70; opacity: 0; }
+              }
+            `}
+          </style>
+          <path className="brain-stroke path-1" d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z" />
+          <path className="brain-stroke path-2" d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z" />
+        </svg>
+      );
+
+      const Logo = () => {
+        const [error, setError] = useState(false);
+        if (error) {
+          return (
+            <div className="flex items-center gap-2">
+              <div className="bg-black text-white p-1 rounded-lg"><PenTool size={20} /></div>
+              <span className="text-2xl font-bold handwritten leading-none">
+                  <span className="text-orange-600">Sketch</span><span className="text-black">X</span>
+              </span>
+            </div>
+          );
+        }
+        return <img src="logo.png" alt="SketchX" className="h-10 w-auto object-contain" onError={() => setError(true)} />;
+      };
+
+      const MemberAvatar = ({ name, image, className = "" }) => {
+        const [error, setError] = useState(false);
+        // Default to fallback if error or no image
+        if (error || !image) {
+          return (
+            <div className={`bg-gray-100 flex items-center justify-center border border-gray-200 text-gray-400 font-serif ${className}`}>
+              <span className="font-bold text-xl">{name.charAt(0)}</span>
+            </div>
+          );
+        }
+        // Try loading image
+        return (
+          <img 
+            src={image} 
+            alt={name} 
+            className={`object-cover ${className}`}
+            onError={() => setError(true)}
+          />
+        );
+      };
+
+      const Navigation = ({ activeSection, scrollToSection }) => {
+        const [isOpen, setIsOpen] = useState(false);
+        const links = [
+          { id: 'hero', label: 'Home' },
+          { id: 'news', label: 'News' },
+          { id: 'research', label: 'Publications' },
+          { id: 'team', label: 'People' },
+        ];
+        return (
+          <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 py-4 transition-all duration-300">
+            <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+              <button className="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none" onClick={() => scrollToSection('hero')}>
+                <Logo />
+              </button>
+              <div className="hidden md:flex gap-8">
+                {links.map((link) => (
+                  <button key={link.id} onClick={() => scrollToSection(link.id)} className={`text-sm font-medium hover:text-orange-600 transition-colors ${activeSection === link.id ? 'text-black border-b-2 border-orange-600' : 'text-gray-500'}`}>
+                    {link.label}
+                  </button>
+                ))}
+              </div>
+              <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
+                {isOpen ? <X /> : <Menu />}
+              </button>
+            </div>
+            {isOpen && (
+              <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 p-6 flex flex-col gap-4 shadow-lg">
+                {links.map((link) => (
+                  <button key={link.id} onClick={() => { scrollToSection(link.id); setIsOpen(false); }} className="text-left text-lg font-medium text-gray-800 hover:text-orange-600">
+                    {link.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </nav>
+        );
+      };
+
+      const SketchyUnderline = ({ children, delay = 0 }) => (
+        <span className="relative inline-block text-gray-400">
+          {children}
+          <svg className="absolute w-full h-4 -bottom-2 left-0 pointer-events-none" viewBox="0 0 100 15" preserveAspectRatio="none">
+            <path d="M2 10 Q 50 14 98 8" stroke="#ea580c" strokeWidth="3" fill="none" strokeLinecap="round" className="sketch-path" style={{ animationDelay: `${delay}s` }} />
+            <path d="M5 8 Q 50 16 95 6" stroke="#ea580c" strokeWidth="1.5" fill="none" strokeLinecap="round" className="sketch-path" style={{ animationDelay: `${delay + 0.1}s`, opacity: 0.6 }} />
+          </svg>
+        </span>
+      );
+
+      const Hero = () => {
+        return (
+          <section id="hero" className="min-h-screen flex flex-col items-center justify-center pt-20 relative overflow-hidden grid-bg">
+            <style>{`
+              .sketch-path { stroke-dasharray: 200; stroke-dashoffset: 200; animation: sketch-draw 1.5s ease-out forwards; }
+              @keyframes sketch-draw { to { stroke-dashoffset: 0; } }
+            `}</style>
+            <div className="absolute inset-0 pointer-events-none opacity-10">
+              <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0,50 Q25,25 50,50 T100,50" stroke="#ea580c" strokeWidth="0.5" fill="none" className="animate-pulse" />
+                <path d="M0,30 Q40,80 80,30" stroke="black" strokeWidth="0.5" fill="none" style={{ animationDuration: '3s' }} className="animate-pulse" />
+                <circle cx="80" cy="20" r="10" stroke="#ea580c" strokeWidth="0.5" fill="none" />
+              </svg>
+            </div>
+            <div className="max-w-7xl mx-auto px-6 text-center z-10 pt-10">
+              <div className="inline-block mb-6 animate-float">
+                <div className="w-20 h-20 bg-black text-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl ring-4 ring-orange-100">
+                  <SketchingBrain className="w-10 h-10 text-orange-500" />
+                </div>
+              </div>
+              <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight leading-tight">
+                How <SketchyUnderline delay={0.2}>Seeing</SketchyUnderline> can be explained by <SketchyUnderline delay={0.8}>Drawing</SketchyUnderline>
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-10 font-light leading-relaxed">
+                The ultimate vision for <span className="font-semibold handwritten text-3xl"><span className="text-orange-600">Sketch</span><span className="text-black">X</span></span> is to translate human sketch data into insights on how human visual systems operate, benefiting both Computer Vision and Cognitive Science.
+              </p>
+              <div className="flex flex-wrap gap-4 justify-center mb-16">
+                <a href="#news" className="px-8 py-4 bg-black text-white font-bold rounded-full hover:bg-gray-800 transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
+                  Latest News <ChevronRight className="w-4 h-4 text-orange-500" />
+                </a>
+                <a href="#research" className="px-8 py-4 bg-white text-black border-2 border-black font-bold rounded-full hover:bg-orange-50 hover:border-orange-600 hover:text-orange-600 transition-all flex items-center justify-center gap-2">
+                  Publications <FileText className="w-4 h-4" />
+                </a>
+              </div>
+              <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-md transition-shadow">
+                  <div className="p-3 bg-blue-50 rounded-full mb-4 text-blue-600"><Eye size={24}/></div>
+                  <h3 className="font-bold text-lg mb-2">Visual Understanding</h3>
+                  <p className="text-gray-500 text-sm">Decoding semantics by leveraging the nuance and abstraction that sketches possess.</p>
+                </div>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-md transition-shadow">
+                  <div className="p-3 bg-orange-50 rounded-full mb-4 text-orange-600"><PenTool size={24}/></div>
+                  <h3 className="font-bold text-lg mb-2">Generative AI</h3>
+                  <p className="text-gray-500 text-sm">Pioneering models that synthesize photorealism from sparse strokes.</p>
+                </div>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-md transition-shadow">
+                  <div className="p-3 bg-green-50 rounded-full mb-4 text-green-600"><Zap size={24}/></div>
+                  <h3 className="font-bold text-lg mb-2">Real-time Creativity</h3>
+                  <p className="text-gray-500 text-sm">Enabling seamless creative flow with instant, interactive feedback loops.</p>
+                </div>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-md transition-shadow">
+                  <div className="p-3 bg-purple-50 rounded-full mb-4 text-purple-600"><Box size={24}/></div>
+                  <h3 className="font-bold text-lg mb-2">3D & VR</h3>
+                  <p className="text-gray-500 text-sm">Bridging 2D sketches with 3D environments for spatial reasoning.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      const News = () => {
+        return (
+          <section id="news" className="py-20 bg-gray-50 border-t border-gray-200">
+            <div className="max-w-4xl mx-auto px-6">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl font-bold mb-4 handwritten">Lab News</h2>
+                <p className="text-gray-500">Updates and community engagement from SketchX.</p>
+              </div>
+              <div className="relative">
+                <div className="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 h-full w-px bg-orange-200"></div>
+                <div className="space-y-12">
+                  {NEWS_DATA.map((item, index) => (
+                    <div key={index} className={`relative flex flex-col md:flex-row gap-8 items-center ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
+                      <div className="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 -translate-x-1/2 w-16 h-16 bg-white border-4 border-orange-100 rounded-full flex items-center justify-center text-xs font-bold text-center text-orange-600 shadow-sm z-10 leading-tight p-1">
+                        {item.date}
+                      </div>
+                      <div className={`w-full md:w-1/2 pl-12 md:pl-0 ${index % 2 === 0 ? 'md:pr-12 md:text-right' : 'md:pl-12 md:text-left'}`}>
+                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:border-orange-300 transition-colors">
+                          <div className={`flex items-center gap-2 text-orange-600 text-xs font-bold uppercase mb-2 ${index % 2 === 0 ? 'md:justify-end' : ''}`}>
+                            {item.type === 'Keynote' ? <Mic size={14}/> : <Users size={14}/>}
+                            {item.type}
+                          </div>
+                          <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                          <p className="text-gray-600 text-sm leading-relaxed">{item.description}</p>
+                        </div>
+                      </div>
+                      <div className="hidden md:block w-1/2"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      const Research = () => {
+        return (
+          <section id="research" className="py-20 bg-white">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="mb-12 border-b-2 border-black pb-4 flex items-end justify-between">
+                <div>
+                  <h2 className="text-4xl font-bold handwritten mb-2">Selected Publications</h2>
+                  <p className="text-gray-500">Recent highlights from the lab.</p>
+                </div>
+                <a href="https://scholar.google.co.uk/citations?user=irZFP_AAAAAJ&hl=en" target="_blank" className="hidden md:flex items-center gap-2 text-sm font-bold hover:text-orange-600 transition-colors">
+                  View Google Scholar <ExternalLink size={14}/>
+                </a>
+              </div>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {NEW_PUBLICATIONS.map((pub, idx) => (
+                  <div key={idx} className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full hover:border-orange-200 relative">
+              <div className="h-48 bg-white overflow-hidden relative">
+                      <img src={pub.image} alt={pub.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
+                      <div className="absolute top-2 right-2 flex flex-col items-end gap-1">
+                        <div className="bg-black text-white text-xs px-2 py-1 font-bold rounded shadow-lg">
+                          {pub.venue}
+                        </div>
+                        <div className="bg-white/90 text-orange-600 text-xs px-2 py-1 font-bold rounded shadow-lg">
+                          {pub.tag}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-6 flex-1 flex flex-col">
+                      <h3 className="text-lg font-bold mb-2 leading-tight group-hover:text-orange-600 transition-colors">{pub.title}</h3>
+                      <p className="text-xs text-gray-500 mb-2 italic line-clamp-2">{pub.authors}</p>
+                      <p className="text-gray-600 text-sm mb-6 flex-1">{pub.abstract}</p>
+                      <div className="flex gap-2 mt-auto">
+                          {pub.links.map((link, lIdx) => (
+                              <a key={lIdx} href={link.url} target="_blank" rel="noopener noreferrer" className="text-sm font-bold uppercase tracking-wider flex items-center gap-2 text-black hover:text-orange-600 transition-all cursor-pointer">
+                              {link.label} <ExternalLink size={14} />
+                              </a>
+                          ))}
+                          {pub.links.length === 0 && (
+                              <span className="text-sm text-gray-400 italic">Paper Link Coming Soon</span>
+                          )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-8 text-center md:hidden">
+                  <a href="https://scholar.google.co.uk/citations?user=irZFP_AAAAAJ&hl=en" target="_blank" className="inline-flex items-center gap-2 text-sm font-bold text-orange-600 border border-orange-200 px-4 py-2 rounded-full">
+                  View Google Scholar <ExternalLink size={14}/>
+                </a>
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      const Team = () => {
+        return (
+          <section id="team" className="py-20 bg-gray-50">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b-2 border-black pb-4">
+                <div>
+                  <h2 className="text-5xl font-bold handwritten mb-2">The People</h2>
+                  <p className="text-gray-500">The minds behind SketchX.</p>
+                </div>
+                <a href="mailto:y.song@surrey.ac.uk" className="mt-4 md:mt-0 px-6 py-2 border border-gray-300 rounded-full hover:bg-black hover:text-white hover:border-black transition-colors text-sm font-medium">
+                  Join SketchX
+                </a>
+              </div>
+
+              {/* Directors */}
+              <div className="mb-16">
+                <h3 className="text-2xl font-bold mb-8 flex items-center gap-2 text-orange-600"><Users size={24} /> Directors</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {TEAM_DATA.directors.map((member, idx) => (
+                    <div key={idx} className="text-center group">
+                      <div className="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-gray-100 p-1 group-hover:border-orange-500 transition-colors">
+                  <MemberAvatar 
+                    name={member.name} 
+                    image={member.image} 
+                    className="w-full h-full rounded-full" 
+                  />
+                      </div>
+                      <h3 className="font-bold text-lg">{member.name}</h3>
+                      <p className="text-orange-600 text-xs font-bold uppercase tracking-wide mb-2">{member.role}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Affiliated */}
+              <div className="mb-16">
+                  <h3 className="text-xl font-bold mb-6 border-b pb-2 flex items-center gap-2 text-orange-600"><GraduationCap size={20} /> Affiliated Academics</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                      {TEAM_DATA.affiliated.map((member, i) => (
+                          <div key={i} className="text-center p-3 bg-white rounded-lg border border-gray-200 hover:border-orange-200 transition-colors group shadow-sm">
+                                  <div className="w-16 h-16 mx-auto mb-2 rounded-full overflow-hidden border border-gray-100 group-hover:border-orange-300">
+                            <MemberAvatar 
+                                name={member.name} 
+                                image={getImgPath(member.name)}
+                                className="w-full h-full"
+                            />
+                                  </div>
+                                  <h4 className="font-bold text-sm leading-tight mb-1">{member.name}</h4>
+                          </div>
+                      ))}
+                  </div>
+              </div>
+
+              {/* PhD Students */}
+              <div className="mb-16">
+                <h3 className="text-xl font-bold mb-6 border-b pb-2 flex items-center gap-2 text-orange-600"><Sparkles size={20} /> PhD Students</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                    {TEAM_DATA.phd.map((member, i) => (
+                        <div key={i} className="text-center p-4 bg-white rounded-lg hover:bg-orange-50 transition-colors border border-transparent hover:border-orange-200 group flex flex-col items-center shadow-sm">
+                              <div className="w-24 h-24 bg-gray-50 border border-gray-100 rounded-full mb-3 overflow-hidden group-hover:border-orange-200 group-hover:shadow-md transition-all">
+                            <MemberAvatar 
+                                name={member.name} 
+                                image={member.image} 
+                                className="w-full h-full"
+                            />
+                              </div>
+                              <p className="text-sm font-bold text-gray-800">{member.name}</p>
+                        </div>
+                    ))}
+                </div>
+              </div>
+
+              {/* Alumni */}
+              <div>
+                  <h3 className="text-xl font-bold mb-6 border-b pb-2 flex items-center gap-2 text-orange-600"><Trophy size={20} /> Alumni</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                      {TEAM_DATA.alumni.map((alum, i) => (
+                          <div key={i} className="text-center p-3 rounded-lg border border-transparent hover:bg-white hover:shadow-sm hover:border-gray-200 transition-all group flex flex-col items-center">
+                                  <div className="w-16 h-16 mx-auto mb-2 rounded-full overflow-hidden border border-gray-200 group-hover:border-orange-300 bg-white">
+                            <MemberAvatar 
+                                name={alum.name} 
+                                image={alum.image}
+                                className="w-full h-full"
+                            />
+                                  </div>
+                                  <span className="font-semibold text-sm group-hover:text-orange-600 transition-colors block leading-tight">{alum.name}</span>
+                                  {alum.current && <span className="text-gray-500 text-[10px] md:text-xs mt-1 block">{alum.current}</span>}
+                          </div>
+                      ))}
+                  </div>
+              </div>
+
+            </div>
+          </section>
+        );
+      };
+
+      const Footer = () => {
+        return (
+          <footer className="bg-white border-t border-gray-200 py-12">
+            <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+              <div className="flex items-center gap-2"><Logo /></div>
+              <div className="flex gap-6 items-center">
+                  <a href="mailto:y.song@surrey.ac.uk" className="text-sm text-gray-500 hover:text-orange-600 flex items-center gap-2 transition-colors">
+                      <Mail size={16} /> Contact
+                  </a>
+                  <div className="text-gray-500 text-sm">
+                  &copy; {new Date().getFullYear()} SketchX Research Lab.
+                  </div>
+              </div>
+              <div className="flex gap-4">
+                <a href="https://www.linkedin.com/in/yi-zhe-song-505782150/" target="_blank" className="text-gray-400 hover:text-orange-600 transition-colors"><Linkedin size={20} /></a>
+              </div>
+            </div>
+          </footer>
+        );
+      };
+
+      const App = () => {
+        const [activeSection, setActiveSection] = useState('hero');
+        const scrollToSection = (id) => {
+          const element = document.getElementById(id);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+            setActiveSection(id);
+          }
+        };
+        useEffect(() => {
+          const handleScroll = () => {
+            const sections = ['hero', 'news', 'research', 'team'];
+            const scrollPosition = window.scrollY + 200;
+            for (const section of sections) {
+              const element = document.getElementById(section);
+              if (element && element.offsetTop <= scrollPosition && (element.offsetTop + element.offsetHeight) > scrollPosition) {
+                setActiveSection(section);
+              }
+            }
+          };
+          window.addEventListener('scroll', handleScroll);
+          return () => window.removeEventListener('scroll', handleScroll);
+        }, []);
+
+        return (
+          <div className="min-h-screen text-gray-900 selection:bg-orange-600 selection:text-white">
+            <Navigation activeSection={activeSection} scrollToSection={scrollToSection} />
+            <main>
+              <Hero />
+              <News />
+              <Research />
+              <Team />
+            </main>
+            <Footer />
+          </div>
+        );
+      };
+
+      const root = createRoot(document.getElementById("root"));
+      root.render(<App />);
+      console.log("App mounted");
+    </script>
 </body>
 </html>
