@@ -156,7 +156,7 @@ const TEAM_DATA = {
     { name: "Yi Li", current: "Senior Research Scientist at JD.com" },
     { name: "Antonio Daniele" }, 
     { name: "Yue Zhong" }, 
-    { name: "Dongliang Chang" }, 
+    { name: "Dongliang Chang", current: "Associate Researcher at the Beijing University of Posts and Telecommunications" }, 
     { name: "Ayan Kumar Bhunia" }, 
     { name: "Ling Luo" }, 
     { name: "Ayan Das" }, 
