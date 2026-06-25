@@ -103,6 +103,12 @@ const NEWS_DATA = [
     type: "Conference Chair"
   },
   {
+  date: "Jun 2026",
+  title: "CVPR 2026",
+  description: "SketchX is presenting four papers at CVPR 2026 in Denver: 'CaricHarmony', 'SemVideo', 'SketchDeco', and 'Block Cascading'. CaricHarmony received the Compute Gold Star ⭐, awarded to just 18 of 16,000+ submissions for computational efficiency, and SemVideo was selected as a Highlight.",
+  type: "Conference"
+  },
+  {
     date: "Dec 2025",
     title: "NeurIPS 2025",
     description: "SketchX is presenting two papers at NeurIPS 2025: 'Normalized Attention Guidance' and 'Fuse2Match', advancing research in diffusion models and semantic matching.",
@@ -123,6 +129,42 @@ const NEWS_DATA = [
 ];
 const NEW_PUBLICATIONS = [
   {
+    title: "CaricHarmony: Contrastive Diffusion Paths for Caricature Synthesis",
+    authors: "D. Wang, D.Y. Chen, Y.Z. Song",
+    venue: "CVPR 2026",
+    tag: "⭐ Compute Gold Star",
+    abstract: "Identity-preserving caricature synthesis via contrastive diffusion paths, achieving expressive exaggeration without heavy computation.",
+    image: "caricharmony.jpg",
+    links: [{ label: "Project Page", url: "https://openaccess.thecvf.com/content/CVPR2026/html/Wang_CaricHarmony_Contrastive_Diffusion_Paths_for_Identity-Preserving_Caricature_Synthesis_CVPR_2026_paper.html" }]
+  },
+  {
+    title: "SemVideo: Reconstructs What You Watch from Brain Activity",
+    authors: "M. Yang, L. Yang, K. Li, H. Zhang, K. Pang, Y.Z. Song",
+    venue: "CVPR 2026",
+    tag: "Highlight Paper",
+    abstract: "Reconstructing dynamic video experiences from fMRI brain signals via hierarchical semantic guidance for temporally coherent synthesis.",
+    image: "semvideo.jpg",
+    links: [{ label: "Project Page", url: "https://openaccess.thecvf.com/content/CVPR2026/html/Yang_SemVideo_Reconstructs_What_You_Watch_from_Brain_Activity_via_Hierarchical_CVPR_2026_paper.html" }]
+  },
+  {
+    title: "SketchDeco: Training-Free Latent Composition for Precise Sketch Colourisation",
+    authors: "C. Utintu, Y.Z. Song",
+    venue: "CVPR 2026",
+    tag: "Generative AI",
+    abstract: "Training-free sketch colourisation using simple masks and palettes for precise regional control.",
+    image: "sketchdeco.jpg",
+    links: [{ label: "Project Page", url: "https://chaitron.github.io/SketchDeco/" }]
+  },
+  {
+    title: "Block Cascading: Acceleration of Video Models",
+    authors: "H. Bandyopadhyay, N. Pinnaparaju, R. Entezari, J. Scott, Y.Z. Song, V. Jampani",
+    venue: "CVPR 2026",
+    tag: "Video AI",
+    abstract: "A training-free acceleration method for block-causal video models that optimizes temporal processing efficiency.",
+    image: "block.jpg",
+    links: [{ label: "Project Page", url: "https://hmrishavbandy.github.io/block_cascading_page/" }]
+  },
+  {
     title: "SD3.5-Flash: Distribution-Guided Distillation",
     authors: "H. Bandyopadhyay, R. Entezari, J. Scott, R. Adithyan, Y.Z. Song, V. Jampani",
     venue: "arXiv 2025",
@@ -132,19 +174,10 @@ const NEW_PUBLICATIONS = [
     links: [{ label: "Project Page", url: "https://hmrishavbandy.github.io/sd35flash/" }]
   },
   {
-    title: "Block Cascading: Acceleration of Video Models",
-    authors: "H. Bandyopadhyay, N. Pinnaparaju, R. Entezari, J. Scott, Y.Z. Song, V. Jampani",
-    venue: "arXiv 2025",
-    tag: "Video AI",
-    abstract: "A training-free acceleration method for block-causal video models that optimizes temporal processing efficiency.",
-    image: "block.jpg",
-    links: [{ label: "Project Page", url: "https://hmrishavbandy.github.io/block_cascading_page/" }]
-  },
-  {
     title: "Normalized Attention Guidance",
     authors: "D.Y. Chen, H. Bandyopadhyay, K. Zou, Y.Z. Song",
     venue: "NeurIPS 2025",
-    tag: "NeurIPS 2025",
+    tag: "Generative AI",
     abstract: "Proposing Universal Negative Guidance for Diffusion Models to improve generation robustness and alignment.",
     image: "nag.jpg",
     links: [{ label: "Project Page", url: "https://chendaryen.github.io/NAG.github.io/" }]
@@ -153,7 +186,7 @@ const NEW_PUBLICATIONS = [
     title: "Nitrofusion: High-fidelity single-step diffusion",
     authors: "D.Y. Chen, H. Bandyopadhyay, K. Zou, Y.Z. Song",
     venue: "CVPR 2025",
-    tag: "CVPR 2025",
+    tag: "Generative AI",
     abstract: "Achieving high-fidelity single-step diffusion generation through dynamic adversarial training strategies.",
     image: "nitro.jpg",
     links: [{ label: "Project Page", url: "https://chendaryen.github.io/NitroFusion.github.io/" }]
@@ -162,7 +195,7 @@ const NEW_PUBLICATIONS = [
     title: "Demofusion: Democratising high-res generation",
     authors: "R. Du, D. Chang, T. Hospedales, Y.Z. Song, Z. Ma",
     venue: "CVPR 2024",
-    tag: "CVPR 2024",
+    tag: "Generative AI",
     abstract: "Democratising high-resolution image generation, allowing standard hardware to produce professional-grade visual content.",
     image: "demo.jpg",
     links: [{ label: "Project Page", url: "https://ruoyidu.github.io/demofusion/demofusion.html" }]
